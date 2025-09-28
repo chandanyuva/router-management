@@ -8,7 +8,7 @@ function App() {
   const [routers, setRouters] = useState([]);
 
   useEffect(() => {
-    fetch("/api/routers") // backend API
+    fetch("http://localhost:3000/api/routers") // backend API
       .then(res => res.json())
       .then(data => setRouters(data))
       .catch(err => console.error("Error fetching routers:", err));

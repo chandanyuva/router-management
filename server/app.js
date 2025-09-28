@@ -8,7 +8,7 @@ const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json())
-app.use(express.urlencoded({ extended: true })); // For parsing application/x-www-form-urlencoded
+// app.use(express.urlencoded({ extended: true })); // For parsing application/x-www-form-urlencoded
 
 app.get("/api/routers", (req, res) => {
   db.all("SELECT * FROM routers", [], (err, rows) => {

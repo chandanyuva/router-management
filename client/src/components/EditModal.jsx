@@ -1,23 +1,34 @@
 import { useState } from "react"
 
-export default function EditModal({ router }) {
+export default function EditModal({ router, onUpdate }) {
   const [currentRouter, setCurrentRouter] = useState({ ...router });
   function updateDetails(e, key) {
-    console.log("update", key, e.target.value)
-    setCurrentRouter({ ...currentRouter, key: e.target.value })
+    console.log("update before", key, e.target.value);
+
+    setCurrentRouter(prev => ({
+      ...prev,
+      [key]: e.target.value   // <-- FIXED: computed property
+    }));
+
+    console.log("update after", key, e.target.value);
   }
+
   async function dbUpdateDetails(e) {
     e.preventDefault();
     try {
-      const body = { currentRouter }
-      const response = await fetch(`/api/routers/${currentRouter.id}`, {
+      const { id, name, ssid, password } = currentRouter;
+      console.log(id, name, ssid, password)
+      const response = await fetch(`http://localhost:3000/api/routers/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body)
+        body: JSON.stringify({ name, ssid, password }),
       })
-      console.log(response)
+      const data = await response.json(); // <-- parse JSON
+      console.log("✅ Update response:", data);
+      // ✅ Tell parent about the update
+      if (onUpdate) onUpdate(data);
     } catch (err) {
-      console.log(err)
+      console.log("❌ Update failed:", err)
     }
   }
   // console.log(currentRouter);
@@ -40,7 +51,7 @@ export default function EditModal({ router }) {
                 <input
                   type="text"
                   className="form-control"
-                  defaultValue={currentRouter.name}
+                  value={currentRouter.name || ""}
                   onChange={e => updateDetails(e, "name")}
                 />
               </div>
@@ -49,7 +60,7 @@ export default function EditModal({ router }) {
                 <input
                   type="text"
                   className="form-control"
-                  defaultValue={currentRouter.ssid}
+                  value={currentRouter.ssid || ""}
                   onChange={e => updateDetails(e, "ssid")}
                 />
               </div>
@@ -58,7 +69,7 @@ export default function EditModal({ router }) {
                 <input
                   type="text"
                   className="form-control"
-                  defaultValue={currentRouter.password}
+                  value={currentRouter.password || ""}
                   onChange={e => updateDetails(e, "password")}
                 />
               </div>

@@ -1,17 +1,30 @@
-import { useState, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Fuse from "fuse.js";
 import EditModal from './EditModal.jsx';
 
 function RoutersTable({ routers }) {
+  // console.log(routers)
+  const [routerList, setRouterList] = useState(routers); // ✅ local state
+  // Sync with prop whenever it changes
+  useEffect(() => {
+    setRouterList(routers || []);
+  }, [routers]);
   const [query, setQuery] = useState("");
 
   // Setup Fuse.js for fuzzy search
-  const fuse = useMemo(() => new Fuse(routers, {
+  const fuse = useMemo(() => new Fuse(routerList, {
     keys: ["name", "ssid", "password"],// fields to search
     threshold: 0.3,// lower = stricter, higher = more fuzzy
-  }), [routers]);
+  }), [routerList]);
 
-  const results = query ? fuse.search(query).map(r => r.item) : routers;
+  const results = query ? fuse.search(query).map(r => r.item) : routerList;
+  function handleRouterUpdate(updatedRouter) {
+    setRouterList((prev) =>
+      prev.map((r) =>
+        r.id === updatedRouter.id ? updatedRouter : r
+      )
+    );
+  }
 
   return (
     <div>
@@ -41,12 +54,12 @@ function RoutersTable({ routers }) {
                 <td>{router.name}</td>
                 <td>{router.ssid}</td>
                 <td>{router.password}</td>
-                <td><EditModal router={router} /></td>
+                <td><EditModal router={router} onUpdate={handleRouterUpdate} /></td>
               </tr>
             ))
           ) : (
             <tr>
-              <td colSpan="4" className="text-center">No routers found</td>
+              <td colSpan="5" className="text-center">No routers found</td>
             </tr>
           )}
         </tbody>
