@@ -46,8 +46,11 @@ app.post("/api/routers", (req, res) => {
     return res.status(400).json({ error: "name | ssid | password are invalid" });
   }
 
+  if (name == "" || ssid == "" || password == "") {
+    return res.status(400).json({ error: "name | ssid | password cannot be empty strings" });
+  }
   const sql = "INSERT INTO routers (name,ssid,password) VALUES (?,?,?)";
-  db.run(sql, [name, ssid, password], function(err) { // use regular function since sometimes in SQLite + Node.js because of how you’re calling db.run(). In sqlite3, the function callback is crucial — arrow functions don’t bind this the way sqlite3 expects.
+  db.run(sql, [name, ssid, password], function(err) { // use regular function since sometimes in SQLite + Node.js because of how you’re calling db.run(). In sqlite3, the function callback is crucial — arrow functions don’t bind 'this' the way sqlite3 expects.
     if (err) {
       console.error("❌ Error inserting router:", err.message);
       return res.status(500).json({ error: err.message });

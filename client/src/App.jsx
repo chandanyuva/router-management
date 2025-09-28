@@ -3,6 +3,7 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import RoutersTable from './components/RoutersTable.jsx';
 
 import { useEffect, useState } from "react";
+import CreateRouter from './components/CreateModal.jsx';
 
 function App() {
   const [routers, setRouters] = useState([]);
@@ -17,6 +18,7 @@ function App() {
   return (
     <div className="container mt-5">
       <h1 className="text-primary">Routers Dashboard</h1>
+      <CreateRouter />
       <RoutersTable routers={routers} />
     </div>
   );

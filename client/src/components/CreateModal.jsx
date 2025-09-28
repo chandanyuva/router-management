@@ -1,47 +1,54 @@
-import { useState } from "react"
+import { useState } from "react";
 
-export default function EditModal({ router }) {
-  const [currentRouter, setCurrentRouter] = useState({ ...router });
+
+export default function CreateRouter() {
+  const [newRouter, setNewRouter] = useState({ name: "", ssid: "", password: "" });
+
+
+
   function updateDetails(e, key) {
+    // console.log(key, e.target.value);
 
-    setCurrentRouter(prev => ({
+
+    setNewRouter(prev => ({
       ...prev,
       [key]: e.target.value   // <-- FIXED: computed property
     }));
 
-    // console.log("Set", key, "to:", currentRouter[`${key}`]);
+    // console.log("Set", key, "to:", newRouter[`${key}`]);
   }
+
 
   async function dbUpdateDetails(e) {
     e.preventDefault();
     try {
-      const { id, name, ssid, password } = currentRouter;
-      console.log(id, name, ssid, password)
-      const response = await fetch(`http://localhost:3000/api/routers/${id}`, {
-        method: "PUT",
+      const { name, ssid, password } = newRouter;
+      console.log(name, ssid, password)
+      const response = await fetch(`http://localhost:3000/api/routers/`, {
+        method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, ssid, password }),
       })
       const data = await response.json(); // <-- parse JSON
-      console.log("✅ Update response:", data);
+      console.log("✅ Post response:", data);
       window.location = "/"; // remove this to see logs before submiting the form
     } catch (err) {
-      console.log("❌ Update failed:", err)
+      console.log("❌ Post failed:", err)
     }
   }
-  // console.log(currentRouter);
+
   return (<>
-    <button type="button" className="btn btn-primary" data-bs-toggle="modal" data-bs-target={`#id-${currentRouter.id}`}>
-      Edit
+    <button type="button" className="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createRouter">
+      + Add Router
     </button>
 
-    <div className="modal fade" id={`id-${currentRouter.id}`} data-bs-backdrop="static" data-bs-keyboard="false" tabIndex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div className="modal fade" id="createRouter" data-bs-backdrop="static" data-bs-keyboard="false" tabIndex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
       <div className="modal-dialog">
         <div className="modal-content">
           <div className="modal-header">
-            <h1 className="modal-title fs-5" id="staticBackdropLabel">{currentRouter.name}</h1>
+            <h1 className="modal-title fs-5" id="staticBackdropLabel">Modal title</h1>
             <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" onClick={() => {
-              setCurrentRouter({ ...router })
+              setNewRouter({ name: "", ssid: "", password: "" })
             }}></button>
           </div>
           <div className="modal-body">
@@ -51,7 +58,8 @@ export default function EditModal({ router }) {
                 <input
                   type="text"
                   className="form-control"
-                  value={currentRouter.name || ""}
+                  placeholder="Router Name"
+                  value={newRouter.name}
                   onChange={e => updateDetails(e, "name")}
                 />
               </div>
@@ -60,7 +68,8 @@ export default function EditModal({ router }) {
                 <input
                   type="text"
                   className="form-control"
-                  value={currentRouter.ssid || ""}
+                  placeholder="Router SSID"
+                  value={newRouter.ssid}
                   onChange={e => updateDetails(e, "ssid")}
                 />
               </div>
@@ -69,21 +78,21 @@ export default function EditModal({ router }) {
                 <input
                   type="text"
                   className="form-control"
-                  value={currentRouter.password || ""}
+                  placeholder="Router Password"
+                  value={newRouter.password}
                   onChange={e => updateDetails(e, "password")}
                 />
               </div>
             </form>
+
           </div>
           <div className="modal-footer">
             <button type="button" className="btn btn-secondary" data-bs-dismiss="modal" onClick={() => {
-              setCurrentRouter({ ...router })
+              setNewRouter({ name: "", ssid: "", password: "" })
             }}>Cancel</button>
-            <button type="button" className="btn btn-primary" onClick={e => dbUpdateDetails(e)} >Save</button>
+            <button type="button" className="btn btn-primary" onClick={(e) => { dbUpdateDetails(e) }}>Add</button>
           </div>
         </div>
       </div>
-    </div>
-  </>)
+    </div></>)
 }
-
